@@ -29,50 +29,260 @@
       color: white;
       border: none;
       cursor: pointer;
+      border-radius: 6px;
+      margin: 5px;
     }
 
     button:hover {
       background-color: darkgreen;
+    }
+
+    /* Nav bar at the top */
+    .navbar {
+      background-color: rgb(32, 78, 44);
+      padding: 10px;
+    }
+
+    .navbar button {
+      background-color: rgb(32, 78, 44);
+      border: 2px solid white;
+    }
+
+    .navbar button:hover {
+      background-color: rgb(74, 163, 74);
+    }
+
+    /* hides pages until you click to them */
+    .page {
+      display: none;
+    }
+
+    .page.active {
+      display: block;
+    }
+
+    input {
+      padding: 8px;
+      border-radius: 6px;
+      border: 1px solid rgb(32, 78, 44);
+      width: 250px;
+    }
+
+    select {
+      padding: 8px;
+      border-radius: 6px;
+      width: 268px;
+    }
+
+    table {
+      width: 90%;
+      margin: 20px auto;
+      border-collapse: collapse;
+      background: white;
+    }
+
+    table, th, td {
+      border: 1px solid rgb(32, 78, 44);
+    }
+
+    th, td {
+      padding: 10px;
+    }
+
+    th {
+      background-color: rgb(74, 163, 74);
+      color: white;
+    }
+
+    .urgent {
+      background-color: #ffcccc;
     }
   </style>
 </head>
 
 <body>
 
+  <!-- NAV BAR -->
+  <div class="navbar">
+    <button onclick="showPage('home')">Home</button>
+    <button onclick="showPage('outage')">Report an Outage</button>
+  </div>
+
   <h1>Eco-Power</h1>
   <p>Transforming trees into usable energy for rural communities.</p>
 
-  <div class="box">
-    <h2>How It Works</h2>
-    <p>1. Trees in forests fall naturally due to storms</p>
-    <p>2. Fallen trees are collected for wood</p>
-    <p>3. Wood is burned with little oxygen (pyrolysis)</p>
-    <p>4. The byproducts (syngas & heat) are captured to generate electricity and power microgrids</p>
+
+  <!-- HOME PAGE -->
+  <div id="home" class="page active">
+
+    <div class="box">
+      <h2>How It Works</h2>
+      <p>1. Trees in forests fall naturally due to storms</p>
+      <p>2. Fallen trees are collected for wood</p>
+      <p>3. Wood is burned with little oxygen (pyrolysis)</p>
+      <p>4. The byproducts (syngas & heat) are captured to generate electricity and power microgrids</p>
+    </div>
+
+    <div class="box">
+      <h2>Energy Calculator</h2>
+
+      <p>Enter number of fallen trees:</p>
+      <input type="number" id="trees" value="10">
+
+      <br><br>
+
+      <button onclick="calculate()">Calculate Energy</button>
+
+      <p id="result"></p>
+    </div>
+
   </div>
 
-  <div class="box">
-    <h2>Energy Calculator</h2>
 
-    <p>Enter number of fallen trees:</p>
-    <input type="number" id="trees" value="10">
+  <!-- OUTAGE REPORTER PAGE -->
+  <div id="outage" class="page">
 
-    <br><br>
+    <div class="box">
+      <h2>Report a Power Outage</h2>
+      <p>Let us know where the outage is so a crew can be sent out. Areas with medical needs or longer outage times are helped first.</p>
 
-    <button onclick="calculate()">Calculate Energy</button>
+      <p>Town:</p>
+      <select id="town">
+        <option value="Pittsburg">Pittsburg</option>
+        <option value="Colebrook">Colebrook</option>
+        <option value="Lancaster">Lancaster</option>
+      </select>
 
-    <p id="result"></p>
+      <br><br>
+
+      <p>Street Address:</p>
+      <input type="text" id="address" placeholder="ex. 12 Main St">
+
+      <br><br>
+
+      <p>Is there anyone home who needs medical equipment or has a serious health condition?</p>
+      <select id="medical">
+        <option value="No">No</option>
+        <option value="Yes">Yes</option>
+      </select>
+
+      <br><br>
+
+      <p>How long has the power been out?</p>
+      <select id="duration">
+        <option value="Less than 1 hour">Less than 1 hour</option>
+        <option value="A few hours">A few hours</option>
+        <option value="1 day">1 day</option>
+        <option value="More than 1 day">More than 1 day</option>
+      </select>
+
+      <br><br>
+
+      <button onclick="reportOutage()">Submit Report</button>
+    </div>
+
+    <div class="box">
+      <h2>Current Outage Reports</h2>
+      <p>Reports are automatically sorted so the most urgent ones (medical needs or longest outage) show up first.</p>
+
+      <table id="outageTable">
+        <tr>
+          <th>Town</th>
+          <th>Address</th>
+          <th>Medical Need?</th>
+          <th>Outage Length</th>
+        </tr>
+      </table>
+    </div>
+
   </div>
+
 
   <script>
+    // ---- PAGE SWITCHING ----
+    function showPage(pageId) {
+      var pages = document.getElementsByClassName("page");
+      for (var i = 0; i < pages.length; i++) {
+        pages[i].classList.remove("active");
+      }
+      document.getElementById(pageId).classList.add("active");
+    }
+
+    // ---- ENERGY CALCULATOR ----
     function calculate() {
       var trees = document.getElementById("trees").value;
-
 
       var energyLowkWh = trees * 300;  // estimating on lower side
       var energyHighkWh = trees * 750; // estimating on higher side
 
       document.getElementById("result").innerHTML =
         "Estimated Energy Output: " + energyLowkWh + " – " + energyHighkWh + " kWh ";
+    }
+
+    // ---- OUTAGE REPORTER ----
+    var outageList = [];
+
+    function reportOutage() {
+      var town = document.getElementById("town").value;
+      var address = document.getElementById("address").value;
+      var medical = document.getElementById("medical").value;
+      var duration = document.getElementById("duration").value;
+
+      if (address === "") {
+        alert("Please enter an address.");
+        return;
+      }
+
+      // give each report an urgency score so we can sort by who needs help first
+      var score = 0;
+      if (medical === "Yes") { score = score + 10; }
+      if (duration === "1 hour") { score = score + 1; }
+      if (duration === "A few hours") { score = score + 2; }
+      if (duration === "1 day") { score = score + 3; }
+      if (duration === "More than 1 day") { score = score + 4; }
+
+      var report = {
+        town: town,
+        address: address,
+        medical: medical,
+        duration: duration,
+        score: score
+      };
+
+      outageList.push(report);
+
+      // sort so highest urgency score is at the top
+      outageList.sort(function(a, b) {
+        return b.score - a.score;
+      });
+
+      updateTable();
+
+      // clear the address box so it's ready for the next report
+      document.getElementById("address").value = "";
+    }
+
+    function updateTable() {
+      var table = document.getElementById("outageTable");
+
+      // remove all rows except the header row
+      while (table.rows.length > 1) {
+        table.deleteRow(1);
+      }
+
+      for (var i = 0; i < outageList.length; i++) {
+        var report = outageList[i];
+        var row = table.insertRow();
+
+        // highlight the row red if it's urgent (medical need)
+        if (report.medical === "Yes") {
+          row.className = "urgent";
+        }
+        row.insertCell(0).innerHTML = report.town;
+        row.insertCell(1).innerHTML = report.address;
+        row.insertCell(2).innerHTML = report.medical;
+        row.insertCell(3).innerHTML = report.duration;
+      }
     }
   </script>
 
