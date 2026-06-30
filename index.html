@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Biochar Energy Project</title>
+
+  <style>
+    body {
+      font-family: Arial;
+      background-color: #b5d9b1;
+      text-align: center;
+    }
+
+    h1 {
+      color: rgb(3, 46, 3);
+    }
+
+    .box {
+      background: rgb(255, 255, 255);
+      padding: 20px;
+      margin: 20px auto;
+      width: 60%;
+      border: 1px solid rgb(32, 78, 44);
+      border-radius: 12px;
+    }
+
+    button {
+      padding: 10px;
+      background-color: rgb(74, 163, 74);
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: darkgreen;
+    }
+  </style>
+</head>
+
+<body>
+
+  <h1>Eco-Power</h1>
+  <p>Transforming trees into usable energy for rural communities.</p>
+
+  <div class="box">
+    <h2>How It Works</h2>
+    <p>1. Trees in forests fall naturally due to storms</p>
+    <p>2. Fallen trees are collected for wood</p>
+    <p>3. Wood is burned with little oxygen (pyrolysis)</p>
+    <p>4. The byproducts (syngas & heat) are captured to generate electricity and power microgrids</p>
+  </div>
+
+  <div class="box">
+    <h2>Energy Calculator</h2>
+
+    <p>Enter number of fallen trees:</p>
+    <input type="number" id="trees" value="10">
+
+    <br><br>
+
+    <button onclick="calculate()">Calculate Energy</button>
+
+    <p id="result"></p>
+  </div>
+
+  <script>
+    function calculate() {
+      var trees = document.getElementById("trees").value;
+
+
+      var energyLowkWh = trees * 300;  // estimating on lower side
+      var energyHighkWh = trees * 750; // estimating on higher side
+
+      document.getElementById("result").innerHTML =
+        "Estimated Energy Output: " + energyLowkWh + " – " + energyHighkWh + " kWh ";
+    }
+  </script>
+
+</body>
+</html>
